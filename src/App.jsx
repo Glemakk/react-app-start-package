@@ -7,7 +7,7 @@ import Filter from './components/Filter';
 
 export default class App extends Component {
   state = {
-    contacts: [ { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' } ],
+    contacts: [],
     filter: '',
   };
 
@@ -28,6 +28,7 @@ export default class App extends Component {
         contacts: [ ...prevState.contacts, newContact ],
       }));
   };
+
 
   deleteContacts = (id) => {
     this.setState(prevState => ({
@@ -54,7 +55,36 @@ export default class App extends Component {
     return contacts.filter(contact => contact.name.toLowerCase().includes(normalizedFilter));
   };
 
+
+  // Считываем с localStorage данные при первой загрузке, т.е. при componentDidUpdate
+  componentDidMount() {
+    console.log('componentDidMount');
+    const contacts = localStorage.getItem('contacts');
+    // console.log('contacts', contacts);
+    const parsedContacts = JSON.parse(contacts);
+    console.log('parsedContacts', parsedContacts);
+    if (parsedContacts) {
+      this.setState({
+        contacts: parsedContacts,
+      });
+    };
+  }
+
+  // Записываем в localStorage данные при каждом обновлении, т.е. при componentDidUpdate
+  componentDidUpdate(prevProps, prevState) {
+    console.log('componentDidUpdate');
+
+    if (this.state.contacts !== prevState.contacts) {
+      console.log('contacts updated');
+
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+
+    // console.log(prevState);
+    // console.log(this.state);
+  }
   render() {
+    console.log('render');
     const { contacts, filter } = this.state;
     const filteredContacts = this.getFilteredContacts();
 
